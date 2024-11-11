@@ -5,8 +5,12 @@ const server = http.createServer();
 const io = socketIO(server);
 
 io.on('connection', (socket) => {
+    console.log('A user connected');
     socket.on('signal', (data) => {
         io.emit('signal', data);
+    });
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
     });
 });
 
