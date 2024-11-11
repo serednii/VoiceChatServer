@@ -1,22 +1,15 @@
-require('dotenv').config();
-const WebSocket = require('ws');
-const express = require('express');
+const http = require('http');
+const socketIO = require('socket.io');
 
-const PORT = process.env.PORT || 8080;
-const app = express();
-const server = app.listen(PORT, () => console.log(`Сервер запущено на порту ${PORT}`));
+const server = http.createServer();
+const io = socketIO(server);
 
-// Налаштування WebSocket-сервера
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', (ws) => {
-    ws.on('message', (message) => {
-        console.log('message', message)
-        // Розсилка повідомлень всім підключеним клієнтам, окрім відправника
-        wss.clients.forEach(client => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
+io.on('connection', (socket) => {
+    socket.on('signal', (data) => {
+        io.emit('signal', data);
     });
+});
+
+server.listen(5000, () => {
+    console.log('Server is listening on port 5000');
 });
